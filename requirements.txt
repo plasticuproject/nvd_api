@@ -1,0 +1,13 @@
+aniso8601==8.0.0
+Click==7.0
+Flask==1.1.1
+Flask-RESTful==0.3.7
+gunicorn==20.0.4
+itsdangerous==1.1.0
+Jinja2==2.11.1
+MarkupSafe==1.1.1
+marshmallow==3.4.0
+pytz==2019.3
+six==1.14.0
+webargs==5.5.3
+Werkzeug==0.16.1
