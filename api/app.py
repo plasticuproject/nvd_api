@@ -21,7 +21,7 @@ api.add_resource(search.CVE_All, '/nvd-api/v1/all')
 api.add_resource(search.Schema, '/nvd-api/v1/schema')
 
 
-# Runs the Flask development server
+# Binds to local host
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0')
     
