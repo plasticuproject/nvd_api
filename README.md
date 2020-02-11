@@ -2,16 +2,16 @@
 
 An unofficial, RESTful API for NIST's NVD.
 
-## Endpoints are:
+## Endpoints with examples:
 
 **Get results for a specific CVE-ID:** <br />
-*https://plasticuproject.pythonanywhere.com/nvd-api/v1/(CVE-ID)* <br />
+*https://plasticuproject.pythonanywhere.com/nvd-api/v1/CVE-2010-4662* <br />
 
 **Get results for all CVEs:** <br />
 *https://plasticuproject.pythonanywhere.com/nvd-api/v1/all* <br />
 
 **Get results for all CVEs in a given year:** <br />
-*https://plasticuproject.pythonanywhere.com/nvd-api/v1/year/(YEAR)* <br />
+*https://plasticuproject.pythonanywhere.com/nvd-api/v1/year/2020* <br />
 
 **Get results for all recently added CVEs (last 8 days):** <br />
 *https://plasticuproject.pythonanywhere.com/nvd-api/v1/recent* <br />
@@ -30,7 +30,7 @@ An unofficial, RESTful API for NIST's NVD.
 *../modified* <br />
 you can also add a keyword search parameter to return only CVEs with <br />
 that keyword found in the description, for example:  <br />
-*https://plasticuproject.pythonanywhere.com/nvd-api/v1/year/2007?keyword=apache* <br />
+*https://plasticuproject.pythonanywhere.com/nvd-api/v1/year/2019?keyword=sudo* <br />
 
 ## Note:
 All endpoint GET requests will return JSON response data.  <br />
