@@ -7,7 +7,7 @@ An unofficial, RESTful API for NIST's NVD.
 **Get results for a specific CVE-ID:** <br />
 *https://plasticuproject.pythonanywhere.com/nvd-api/v1/CVE-2010-4662* <br />
 
-**Get results for all CVEs:** <br />
+**Get results for all CVEs:** *(Not recommended, you should refine your search.)* <br />
 *https://plasticuproject.pythonanywhere.com/nvd-api/v1/all* <br />
 
 **Get results for all CVEs in a given year:** <br />
@@ -37,3 +37,20 @@ All endpoint GET requests will return JSON response data.  <br />
 Live API database will be updated once every 24 hours, with information from **nvd.nist.gov**.  <br />
 Feel free to submit an Issue or Pull Request (with issue reference number)  <br />
 if you have any problems.
+
+## Example Python Client
+In the *example_clients* directory there is a simple python CLI client that lets you <br />
+search for CVEs and print their CVE-ID and Description to screen. This is just an example <br />
+of how you could write an application and interface this API. <br />
+```
+user@ubuntu:~$ ./nvd_api/example_clients/cve_search.py --help
+
+Search CVE records by ID, YEAR and/or KEYWORD. Prints ID and description only.
+
+        USAGE:
+        ./cve_search.py <CVE-ID>
+        ./cve_serach.py <year> (keyword)
+        ./cve_search.py all (keyword)
+        ./cve_search.py recent (keyword)
+        ./cve_search.py modified (keyword)
+```
