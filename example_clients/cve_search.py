@@ -28,7 +28,7 @@ def search(*args):
         quit()
 
     # Adds CVE ID and description to cves dictionary from results matching CVE-ID queried
-    elif len(args) == 2 and args[1].startswith('cve') == True or args[1].startswith('CVE') == True:
+    elif len(args) == 2 and args[1].startswith('cve') or args[1].startswith('CVE'):
         cve = args[1]
         res = requests.get(url + cve)
         cves[res.json()['cve']['CVE_data_meta']['ID']] = res.json()['cve']['description']['description_data'][0]['value']
@@ -51,9 +51,9 @@ def search(*args):
         quit()
 
     # Prints CVE ID/s and description/s from cves dictionary, if any
-    for k, v in cves.items():
-        print('\n' + k)
-        print(v + '\n')
+    for ID, description in cves.items():
+        print('\n' + ID)
+        print(description + '\n')
 
 
 if __name__ == '__main__':
