@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-#MIT License
-#Copyright (C) 2020 plasticuproject@pm.me
+#Copyright (C) 2020  plasticuproject@pm.me
 # 'pip install requests' to use
 
 import requests
