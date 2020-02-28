@@ -54,6 +54,11 @@ def search(*args):
     for ID, description in cves.items():
         print('\n' + ID)
         print(description + '\n')
+        
+    # Prints number of results
+    if len(cves) > 1:
+        print('Results found:', str(len(cves)))
+        print()
 
 
 if __name__ == '__main__':
