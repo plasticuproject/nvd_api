@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/plasticuproject/nvd_api.svg?branch=master)](https://travis-ci.org/plasticuproject/nvd_api)
 # nvd_api
 
 An unofficial, RESTful API for NIST's NVD.
