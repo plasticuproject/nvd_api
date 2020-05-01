@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/plasticuproject/nvd_api.svg?branch=master)](https://travis-ci.org/plasticuproject/nvd_api)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
+[![Coverage Status](https://coveralls.io/repos/github/plasticuproject/nvd_api/badge.svg?branch=master)](https://coveralls.io/github/plasticuproject/nvd_api?branch=master)
 # nvd_api
 
 An unofficial, RESTful API for NIST's NVD.
