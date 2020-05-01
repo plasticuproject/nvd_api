@@ -4,7 +4,7 @@ Copyright (C) 2020  plasticuproject@pm.me
 """
 
 from flask import Flask
-from resources import search
+from api.resources import search
 from flask_restful import Api
 
 
