@@ -5,3 +5,5 @@ install:
 - pip3 install -r requirements.txt
 script:
 - coverage run test_basic.py -v
+after_success:
+  - coveralls
