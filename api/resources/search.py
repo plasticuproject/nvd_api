@@ -66,7 +66,7 @@ class CVE(Resource):
         year = cve_id[4:8]
         check_year(year)
         if int(year) > 2002:
-            for cve in data(str(year)):
+            for cve in data(year):
                 if cve['cve']['CVE_data_meta']['ID'] == cve_id:
                     return cve
         elif int(year) <= 2002:

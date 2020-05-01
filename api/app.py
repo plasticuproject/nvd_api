@@ -22,6 +22,6 @@ api.add_resource(search.Schema, '/nvd-api/v1/schema')
 
 
 # Binds to local host
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+#if __name__ == '__main__':
+    #app.run(host='0.0.0.0')
     
