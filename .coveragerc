@@ -2,3 +2,4 @@
 omit =
   */site-packages/*
   */distutils/*
+  test_basic.py

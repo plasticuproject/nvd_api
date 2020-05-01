@@ -4,6 +4,6 @@ python:
 install:
 - pip3 install -r requirements.txt
 script:
-- coverage report test_basic.py -v
+- coverage report test_basic.py 
 after_success:
   - coveralls
