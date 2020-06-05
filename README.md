@@ -39,7 +39,13 @@ that keyword found in the description, for example:  <br />
 All endpoint GET requests will return JSON response data.  <br />
 Live API database will be updated once every 24 hours, with information from **nvd.nist.gov**.  <br />
 Feel free to submit an Issue or Pull Request (with issue reference number)  <br />
-if you have any problems.
+if you have any problems. <br />
+
+## Development / Self Hosting
+If you plan on contributing, developing, or hosting yourself, be sure to run the <br />
+`update.py` script at least once every 24 hours. Failure to do this will cause the <br />
+database to loose sync. If this happens just delete all the dump files in `api/dumps` <br />
+and run `update.py` to reinstall them. <br />
 
 ## Example Python Client
 In the *example_clients* directory there is a simple python CLI client that lets you <br />

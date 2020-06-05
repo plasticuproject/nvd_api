@@ -24,17 +24,17 @@ class Database:
     into memory in dictionary format.
     """
 
-    def data(self, year):
+    def data(self, year, path=''):
 
         # Used to return any or all archived files by year
-        file = 'api/dumps/nvdcve-1.1-' + year + '.json.gz'
+        file = path + 'api/dumps/nvdcve-1.1-' + year + '.json.gz'
         return return_data(file)
 
 
-    def modified(self):
+    def modified(self, path=''):
 
         # Used to return modified archive
-        file = 'api/dumps/nvdcve-1.1-modified.json.gz'
+        file = path + 'api/dumps/nvdcve-1.1-modified.json.gz'
         return return_data(file)
 
 
