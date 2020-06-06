@@ -6,9 +6,10 @@ Copyright (C) 2020  plasticuproject@pm.me
 import gzip
 import json
 import pathlib
-from datetime import datetime
+from urllib.request import urlopen
 from resources.model import Database
 from urllib.request import urlretrieve
+from dateutil.parser import isoparse as date_parse
 
 
 # NIST NVD JSON Dump file locations
@@ -40,6 +41,15 @@ files = ['https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-modified.json.gz',
 path = str(pathlib.Path(__file__).parent.absolute()) + '/dumps'
 
 
+def get_meta():
+
+    # get time when modified file was last updated
+    metaURL = urlopen('https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-modified.meta')
+    newMetaTime = metaURL.readlines()[0][17:-2].decode()
+    with open(path + '/modified.meta', 'w') as outfile:
+        outfile.write(newMetaTime)
+
+
 def get_dumps():
 
     #look for dump files and retrieve if not found
@@ -50,25 +60,31 @@ def get_dumps():
         urlPath = pathlib.Path(__file__).parent.absolute() / ('dumps' + url[39:])
         if not urlPath.is_file():
             urlretrieve(url, path + url[39:])
+    get_meta()
 
 
 def update():
 
-    # download modified and recent dump, update dumps with new cve info
-    today = str(datetime.now())[:10]
-    nowtime = str(datetime.now())[:20].replace(' ', 'T').replace('.', 'Z')
+    # download modified and recent dumps
     modifiedFile = path + files[0][39:]
     urlretrieve(files[0], modifiedFile)
 
     recentFile = path + files[1][39:]
     urlretrieve(files[1], recentFile)
-
-    modified = Database().modified(path='../')
-
-    # This will only grab cves from the modified file that match todays date
-    # set slice this date to match your update frequency
-    newModified = [cve for cve in modified if cve['lastModifiedDate'][:10] == today]
     
+    # get time when modified file was last updated
+    with open(path + '/modified.meta', 'r') as infile:
+        metaTime = infile.read()
+    modifiedTime = date_parse(metaTime)
+
+    # make new list of cves to add
+    modified = Database().modified(path='../')
+    newModified = [cve for cve in modified if date_parse(cve['lastModifiedDate']) > modifiedTime]
+
+    # get new modified update time
+    get_meta()
+    
+    #organize cves by year
     for year in range(2002, 2021):   # Keep up-to-date with current year
         modifiedCves = []
         for cve in newModified:
@@ -79,6 +95,7 @@ def update():
             if cveYear == str(year):
                 modifiedCves.append(cve)
 
+        # add cves to files
         if len(modifiedCves) > 0:
             data = Database().data(str(year), path='../')
             for cve in modifiedCves:
@@ -88,10 +105,11 @@ def update():
                         "CVE_data_format" : "MITRE",
                         "CVE_data_version" : "4.0",
                         "CVE_data_numberOfCVEs" : cveNum,
-                        "CVE_data_timestamp" : nowtime,
+                        "CVE_data_timestamp" : metaTime,
                         "CVE_Items" : data
                         }
 
+            # write cves to data files
             bytesData = json.dumps(contents).encode('utf-8')
             fileName = '/nvdcve-1.1-' + cveYear + '.json.gz'
             filePath = pathlib.Path(__file__).parent.absolute() / 'dumps' + fileName
