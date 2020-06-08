@@ -6,6 +6,7 @@ Copyright (C) 2020  plasticuproject@pm.me
 import gzip
 import json
 import pathlib
+from urllib.error import URLError
 from urllib.request import urlopen
 from resources.model import Database
 from urllib.request import urlretrieve
@@ -79,7 +80,24 @@ def update():
 
     # make new list of cves to add
     modified = Database().modified(path='../')
-    newModified = [cve for cve in modified if date_parse(cve['lastModifiedDate']) > modifiedTime]
+    newModified = []
+    for cve in modified:
+        cveDate = date_parse(cve['lastModifiedDate'])
+        #print(f"{cveDate} > {modifiedTime}")           # <- DEBUG print
+        #print(cveDate > modifiedTime)                  # <- DEBUG print
+        if cveDate > modifiedTime:
+            newModified.append(cve)
+
+    ## DEBUG SECTION
+    '''
+    for i in newModified:
+        print('##DEBUG##')
+        print('[*] ADDED: ')
+        print(f"[*]  ID : {i['cve']['CVE_data_meta']['ID']}")
+        print(f"[*] DATE: {['lastModifiedDate']}")
+        print()
+    '''
+    ## END DEBUG SECTION
 
     # get new modified update time
     get_meta()
@@ -100,7 +118,7 @@ def update():
             data = Database().data(str(year), path='../')
             for cve in modifiedCves:
                 data.append(cve)
-            cveNum = len(data) - 1
+            cveNum = len(data)
             contents = {"CVE_data_type" : "CVE",
                         "CVE_data_format" : "MITRE",
                         "CVE_data_version" : "4.0",
@@ -120,5 +138,10 @@ def update():
 
 
 if __name__ == "__main__":
-    get_dumps()
-    update()
+
+    try:
+        get_dumps()
+        update()
+    except URLError as e:
+        print(e)
+        quit()
