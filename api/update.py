@@ -82,6 +82,8 @@ def update():
     modified = Database().modified(path='../')
     newModified = [cve for cve in modified if date_parse(cve['lastModifiedDate']) > modifiedTime]
 
+    print(newModified) # DEBUG
+
     # get new modified update time
     get_meta()
     
@@ -113,7 +115,7 @@ def update():
             # write cves to data files
             bytesData = json.dumps(contents).encode('utf-8')
             fileName = '/nvdcve-1.1-' + cveYear + '.json.gz'
-            filePath = pathlib.Path(__file__).parent.absolute() / 'dumps' + fileName
+            filePath = pathlib.Path(__file__).parent.absolute() / ('dumps' + fileName)
             filePath.unlink()
             file = path + fileName
             with gzip.open(file, 'wb') as datafile:
