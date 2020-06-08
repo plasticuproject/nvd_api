@@ -3,4 +3,4 @@
 cd api;
 python update.py;
 cd ../;
-python test_basic.py;
+coverage run test_basic.py -v;
