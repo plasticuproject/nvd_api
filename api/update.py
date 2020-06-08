@@ -57,11 +57,11 @@ def get_dumps():
     schemaPath = pathlib.Path(__file__).parent.absolute() / ('dumps' + schema[41:])
     if not schemaPath.is_file():
         urlretrieve(schema, path + schema[41:])
+        get_meta()
     for url in files[2:]:
         urlPath = pathlib.Path(__file__).parent.absolute() / ('dumps' + url[39:])
         if not urlPath.is_file():
             urlretrieve(url, path + url[39:])
-    get_meta()
 
 
 def update():
@@ -80,24 +80,7 @@ def update():
 
     # make new list of cves to add
     modified = Database().modified(path='../')
-    newModified = []
-    for cve in modified:
-        cveDate = date_parse(cve['lastModifiedDate'])
-        #print(f"{cveDate} > {modifiedTime}")           # <- DEBUG print
-        #print(cveDate > modifiedTime)                  # <- DEBUG print
-        if cveDate > modifiedTime:
-            newModified.append(cve)
-
-    ## DEBUG SECTION
-    '''
-    for i in newModified:
-        print('##DEBUG##')
-        print('[*] ADDED: ')
-        print(f"[*]  ID : {i['cve']['CVE_data_meta']['ID']}")
-        print(f"[*] DATE: {['lastModifiedDate']}")
-        print()
-    '''
-    ## END DEBUG SECTION
+    newModified = [cve for cve in modified if date_parse(cve['lastModifiedDate']) > modifiedTime]
 
     # get new modified update time
     get_meta()
