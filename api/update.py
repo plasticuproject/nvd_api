@@ -40,7 +40,7 @@ files = ['https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-modified.json.gz',
 
 # Path to dump files
 path = str(pathlib.Path(__file__).parent.absolute()) + '/dumps'
-
+path2 = str(pathlib.Path(__file__).parent.absolute()) + '/../'
 
 def get_meta():
 
@@ -79,10 +79,10 @@ def update():
     modifiedTime = date_parse(metaTime)
 
     # make new list of cves to add
-    modified = Database().modified(path='../')
+    modified = Database().modified(path=path2)
     newModified = [cve for cve in modified if date_parse(cve['lastModifiedDate']) > modifiedTime]
 
-    print(newModified) # DEBUG
+    #print(newModified) # DEBUG
 
     # get new modified update time
     get_meta()
@@ -100,7 +100,7 @@ def update():
 
         # add cves to files
         if len(modifiedCves) > 0:
-            data = Database().data(str(year), path='../')
+            data = Database().data(str(year), path=path2)
             for cve in modifiedCves:
                 data.append(cve)
             cveNum = len(data)
