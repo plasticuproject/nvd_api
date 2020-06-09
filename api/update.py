@@ -101,15 +101,16 @@ def update():
         # add cves to files
         if len(modifiedCves) > 0:
             data = Database().data(str(year), path=path2)
-            for cve in modifiedCves:
-                data.append(cve)
-            cveNum = len(data)
+            newData = [cve for cve in data if cve['cve']['CVE_data_meta']['ID'] not in modifiedCves]
+            [newData.append(cve) for cve in modifiedCves]
+            cveNum = len(newData)
+            #print(cveNum) # DEBUG
             contents = {"CVE_data_type" : "CVE",
                         "CVE_data_format" : "MITRE",
                         "CVE_data_version" : "4.0",
                         "CVE_data_numberOfCVEs" : cveNum,
                         "CVE_data_timestamp" : metaTime,
-                        "CVE_Items" : data
+                        "CVE_Items" : newData
                         }
 
             # write cves to data files
