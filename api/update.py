@@ -81,7 +81,6 @@ def update():
     # make new list of cves to add
     modified = Database().modified(path=path2)
     newModified = [cve for cve in modified if date_parse(cve['lastModifiedDate']) > modifiedTime]
-    #print(newModified) # DEBUG
 
     # get new modified update time
     get_meta()
@@ -101,13 +100,19 @@ def update():
         if len(modifiedCves) > 0:
             data = Database().data(str(year), path=path2)
             for cveID in modifiedCves:
-                ID = cveID['cve']['CVE_data_meta']['ID'][4:8]
+                ID = cveID['cve']['CVE_data_meta']['ID']
                 for cve in data:
-                    if ID == cve['cve']['CVE_data_meta']['ID'][4:8]:
+                    if ID == cve['cve']['CVE_data_meta']['ID']:
                         data.remove(cve)
             [data.append(cve) for cve in modifiedCves]
+            '''
+            # DEBUG START #
+            for i in modifiedCves:
+                print('[*] Added: ' + i['cve']['CVE_data_meta']['ID'][4:8])
+                print(i['cve']['CVE_data_meta']['ID'])
+            # DEBUG END #
+            '''
             cveNum = len(data)
-            #print(cveNum) # DEBUG
             contents = {"CVE_data_type" : "CVE",
                         "CVE_data_format" : "MITRE",
                         "CVE_data_version" : "4.0",
