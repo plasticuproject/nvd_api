@@ -92,26 +92,17 @@ def update():
             cveYear = cve['cve']['CVE_data_meta']['ID'][4:8]
             if int(cveYear) < 2003:
                 cveYear = '2002'
-
             if cveYear == str(year):
                 modifiedCves.append(cve)
 
         # add cves to files
         if len(modifiedCves) > 0:
-            data = Database().data(str(year), path=path2)
             for cveID in modifiedCves:
+                cveYear = cveID['cve']['CVE_data_meta']['ID'][4:8]
                 ID = cveID['cve']['CVE_data_meta']['ID']
-                for cve in data:
-                    if ID == cve['cve']['CVE_data_meta']['ID']:
-                        data.remove(cve)
+                data = Database().data(cveYear, path=path2)
+                [data.remove(cve) for cve in data if ID == cve['cve']['CVE_data_meta']['ID']]
             [data.append(cve) for cve in modifiedCves]
-            '''
-            # DEBUG START #
-            for i in modifiedCves:
-                print('[*] Added: ' + i['cve']['CVE_data_meta']['ID'][4:8])
-                print(i['cve']['CVE_data_meta']['ID'])
-            # DEBUG END #
-            '''
             cveNum = len(data)
             contents = {"CVE_data_type" : "CVE",
                         "CVE_data_format" : "MITRE",
