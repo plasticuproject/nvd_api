@@ -6,19 +6,11 @@ Copyright (C) 2020  plasticuproject@pm.me
 from flask_restful import Resource, abort
 from .model import Database
 from webargs import fields
-from webargs.flaskparser import use_args, parser, abort
+from webargs.flaskparser import use_args
 
 
 # Sets variable name for keyword search parameter
 keyword = {'keyword' : fields.Str(missing='')}
-
-
-@parser.error_handler
-def handle_request_parsing_error(err, req, schema, error_status_code, error_headers):
-
-    # Webargs error handler that uses Flask-RESTful's abort function to return
-    # a JSON error response to the client.
-    abort(error_status_code, errors=err.messages)
 
 
 def return_result(set, *args):
@@ -60,6 +52,9 @@ class CVE(Resource):
     CVE-ID in a JSON response via a GET request.
     """
 
+    # For the rate limiter decorator
+    decorators = []
+
     def get(self,cve_id):
         cve_id = cve_id.upper()
         data = Database().data
@@ -81,6 +76,9 @@ class CVE_Year(Resource):
     year and keyword argument in a JSON response via a GET request.
     If no keyword is given it will return all CVEs in the file.
     """
+
+    # For the rate limiter decorator
+    decorators = []
 
     @use_args(keyword)
     def get(self, args, year):
@@ -105,6 +103,9 @@ class CVE_Modified(Resource):
     is given it will return all CVEs in the file.
     """
 
+    # For the rate limiter decorator
+    decorators = []
+
     @use_args(keyword)
     def get(self, args):
         modified = Database().modified
@@ -120,6 +121,9 @@ class CVE_Recent(Resource):
     keyword argument in a JSON response via a GET request. If no keyword
     is given it will return all CVEs in the file.
     """
+
+    # For the rate limiter decorator
+    decorators = []
 
     @use_args(keyword)
     def get(self, args):
@@ -137,6 +141,9 @@ class CVE_All(Resource):
     is given it will return all CVEs in the file.
     """
 
+    # For the rate limiter decorator
+    decorators = []
+
     @use_args(keyword)
     def get(self, args):
         result = []
@@ -153,6 +160,9 @@ class Schema(Resource):
     """Initiates the Database class, loads the schema file in memory and
     returns the database schema contents in a JSON response via a GET request.
     """
+
+    # For the rate limiter decorator
+    decorators = []
 
     def get(self):
         schema = Database().schema
