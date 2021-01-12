@@ -148,7 +148,7 @@ class CVE_All(Resource):
     def get(self, args):
         result = []
         data = Database().data
-        for year in range(2002, 2021):
+        for year in range(2002, 2022):  # Keep up-to-date with current year
             for cve in data(str(year)):
                 result.append(cve)
         if args['keyword'] == '':
