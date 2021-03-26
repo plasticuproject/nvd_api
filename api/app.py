@@ -29,6 +29,7 @@ search.CVE_Year.decorators.append(rate)
 search.CVE_Modified.decorators.append(rate)
 search.CVE_Recent.decorators.append(rate)
 search.CVE_All.decorators.append(rate)
+search.CVE_CPE.decorators.append(rate)
 search.Schema.decorators.append(rate)
 
 
@@ -38,6 +39,7 @@ api.add_resource(search.CVE_Year, '/nvd-api/v1/year/<year>')
 api.add_resource(search.CVE_Modified, '/nvd-api/v1/modified')
 api.add_resource(search.CVE_Recent, '/nvd-api/v1/recent')
 api.add_resource(search.CVE_All, '/nvd-api/v1/all')
+api.add_resource(search.CVE_CPE, '/nvd-api/v1/cpe/<cpe_version>/<cpe_id>')
 api.add_resource(search.Schema, '/nvd-api/v1/schema')
 
 
