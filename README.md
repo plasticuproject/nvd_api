@@ -35,6 +35,7 @@ An unofficial, RESTful API for NIST's NVD.
 *../year/(YEAR)* <br />
 *../recent* <br />
 *../modified* <br />
+*../cpe/(CPE-Version)/(CPE-ID matcher)* <br />
 you can also add a keyword search parameter to return only CVEs with <br />
 that keyword found in the description, for example:  <br />
 *https://plasticuproject.pythonanywhere.com/nvd-api/v1/year/2019?keyword=sudo* <br />
