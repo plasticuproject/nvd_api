@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/plasticuproject/nvd_api.svg?branch=master)](https://travis-ci.org/plasticuproject/nvd_api)
+[![Build Status](https://travis-ci.com/plasticuproject/nvd_api.svg?branch=master)](https://travis-ci.org/plasticuproject/nvd_api)
 [![Python 3.7](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/release/python-370/)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 [![Coverage Status](https://coveralls.io/repos/github/plasticuproject/nvd_api/badge.svg?branch=master)](https://coveralls.io/github/plasticuproject/nvd_api?branch=master)
@@ -26,6 +26,9 @@ An unofficial, RESTful API for NIST's NVD.
 **Get results for all recently modified and added CVEs (last 8 days):** <br />
 *https://plasticuproject.pythonanywhere.com/nvd-api/v1/modified* <br />
 
+**Get results for all CVEs matching provided CPE VERSION and CPE-ID:** <br />
+*https://plasticuproject.pythonanywhere.com/nvd-api/v1/cpe/23/arris* <br />
+
 **Return the database schema:** <br />
 *https://plasticuproject.pythonanywhere.com/nvd-api/v1/schema* <br />
 
@@ -35,6 +38,7 @@ An unofficial, RESTful API for NIST's NVD.
 *../year/(YEAR)* <br />
 *../recent* <br />
 *../modified* <br />
+*../cpe/(CPE-Version)/(CPE-ID matcher)* <br />
 you can also add a keyword search parameter to return only CVEs with <br />
 that keyword found in the description, for example:  <br />
 *https://plasticuproject.pythonanywhere.com/nvd-api/v1/year/2019?keyword=sudo* <br />

@@ -36,6 +36,35 @@ def keyword_search(value, result):
                 keyword_results.append(cve)
     return keyword_results
 
+def cpe_search(value, result, version: str='23'):
+    
+    # Helper function to search for results with a matching CPE value
+    results = []
+
+    def find_leaves(nodes):
+
+        # Recursive function to obtain all configuration leaves of a CVE's
+        # configuration nodes.
+        leaves = []
+        for subnode in nodes:
+            if 'children' in subnode.keys():
+                leaves += find_leaves(subnode['children'])
+            elif 'cpe_match' in subnode.keys():
+                leaves += find_leaves(subnode['cpe_match'])
+            else:
+                leaves.append(subnode)
+        return leaves
+
+    for cve in result:
+        if 'configurations' in cve and 'nodes' in cve['configurations']:
+            leaves = find_leaves(cve['configurations']['nodes'])
+            for leaf in leaves:
+                key = 'cpe' + version + 'Uri'
+                if key in leaf.keys() and value in leaf[key]:
+                    results.append(cve)
+    return results
+
+
 
 def check_year(year):
 
@@ -154,6 +183,29 @@ class CVE_All(Resource):
         if args['keyword'] == '':
             return result
         return keyword_search(args['keyword'].lower(), result)
+
+
+class CVE_CPE(Resource):
+    """Initiates the Database class, loads all CVE archive
+    file in memory and returns all CVE data in the file matching the given
+    CPE-ID and keyword argument in a JSON response via a GET request.
+    If no keyword is given it will return all CVEs matching the CPE-ID.
+    Besides the CPE-ID, also the CPE-Version (23/24/etc.) must be specified.
+    """
+
+    # For the rate limiter decorator
+    decorators = []
+
+    @use_args(keyword)
+    def get(self, args, cpe_version, cpe_id):
+        result = []
+        data = Database().data
+        for year in range(2002, 2022):  # Keep up-to-date with current year
+            for cve in data(str(year)):
+                result.append(cve)
+        if args['keyword'] != '':
+            result = keyword_search(args['keyword'].lower(), result)
+        return cpe_search(cpe_id, result, version=str(cpe_version))
 
 
 class Schema(Resource):

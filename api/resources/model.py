@@ -3,7 +3,6 @@ An unofficial, RESTful API for NIST's NVD.
 Copyright (C) 2020  plasticuproject@pm.me
 """
 
-from flask_restful import abort
 import json
 import gzip
 
@@ -11,12 +10,9 @@ import gzip
 def return_data(file):
 
     # Helper function to load database files into memory
-    try:
-        with gzip.open(file, 'rb') as datafile:
-            data = json.loads(datafile.read())['CVE_Items']
-            return data
-    except FileNotFoundError:
-        abort(404, message='No such endpoint exists')
+    with gzip.open(file, 'rb') as datafile:
+        data = json.loads(datafile.read())['CVE_Items']
+        return data
 
 
 class Database:
