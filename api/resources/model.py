@@ -3,7 +3,6 @@ An unofficial, RESTful API for NIST's NVD.
 Copyright (C) 2020  plasticuproject@pm.me
 """
 
-from flask_restful import abort
 import json
 import gzip
 

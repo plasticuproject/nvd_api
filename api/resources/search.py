@@ -60,9 +60,8 @@ def cpe_search(value, result, version: str='23'):
             leaves = find_leaves(cve['configurations']['nodes'])
             for leaf in leaves:
                 key = 'cpe' + version + 'Uri'
-                if key in leaf.keys():
-                    if value in leaf[key]:
-                        results.append(cve)
+                if key in leaf.keys() and value in leaf[key]:
+                    results.append(cve)
     return results
 
 
