@@ -64,5 +64,15 @@ class BasicTests(unittest.TestCase):
          self.assertEqual(response3.status_code, 404)
 
 
+    def test_cpe(self):
+        response = self.app.get('/nvd-api/v1/cpe/23/arris', follow_redirects=True)
+        response2 = self.app.get(
+                '/nvd-api/v1/cpe/23/arris?keyword=buffer overflow',
+                follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response2.status_code, 200)
+
+
+
 if __name__ == "__main__":
     unittest.main()

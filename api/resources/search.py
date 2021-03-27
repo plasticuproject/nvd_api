@@ -37,15 +37,14 @@ def keyword_search(value, result):
     return keyword_results
 
 def cpe_search(value, result, version: str='23'):
-    """
-    Helper function to search for results with a matching CPE value
-    """
+    
+    # Helper function to search for results with a matching CPE value
     results = []
+
     def find_leaves(nodes):
-        """
-        Recursive function to obtain all configuration leaves of a CVE's
-        configuration nodes.
-        """
+
+        # Recursive function to obtain all configuration leaves of a CVE's
+        # configuration nodes.
         leaves = []
         for subnode in nodes:
             if 'children' in subnode.keys():
@@ -57,16 +56,13 @@ def cpe_search(value, result, version: str='23'):
         return leaves
 
     for cve in result:
-        if 'configurations' not in cve:
-            continue
-        if 'nodes' not in cve['configurations']:
-            continue
-        leaves = find_leaves(cve['configurations']['nodes'])
-        for leaf in leaves:
-            key = 'cpe' + version + 'Uri'
-            if key in leaf.keys():
-                if value in leaf[key]:
-                    results.append(cve)
+        if 'configurations' in cve and 'nodes' in cve['configurations']:
+            leaves = find_leaves(cve['configurations']['nodes'])
+            for leaf in leaves:
+                key = 'cpe' + version + 'Uri'
+                if key in leaf.keys():
+                    if value in leaf[key]:
+                        results.append(cve)
     return results
 
 
@@ -198,7 +194,7 @@ class CVE_CPE(Resource):
     Besides the CPE-ID, also the CPE-Version (23/24/etc.) must be specified.
     """
 
-    # For the rate limiter necorator
+    # For the rate limiter decorator
     decorators = []
 
     @use_args(keyword)
