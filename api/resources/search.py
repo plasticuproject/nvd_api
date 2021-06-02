@@ -47,7 +47,7 @@ def cpe_search(value, result, version: str='23'):
         # configuration nodes.
         leaves = []
         for subnode in nodes:
-            if 'children' in subnode.keys():
+            if 'children' in subnode.keys() and len(subnode['children']) > 0:
                 leaves += find_leaves(subnode['children'])
             elif 'cpe_match' in subnode.keys():
                 leaves += find_leaves(subnode['cpe_match'])
