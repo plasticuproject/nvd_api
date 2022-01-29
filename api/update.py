@@ -1,126 +1,134 @@
 """
 An unofficial, RESTful API for NIST's NVD.
-Copyright (C) 2020  plasticuproject@pm.me
+Copyright (C) 2022  plasticuproject@pm.me
 """
 
 import gzip
 import json
 import pathlib
+from sys import exit as sys_exit
+from typing import List
 from urllib.error import URLError
 from urllib.request import urlopen
-from resources.model import Database
 from urllib.request import urlretrieve
 from dateutil.parser import isoparse as date_parse
-
+from resources.model import Database
 
 # NIST NVD JSON Dump file locations
-schema = 'https://csrc.nist.gov/schema/nvd/feed/1.1/nvd_cve_feed_json_1.1.schema'
-files = ['https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-modified.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-recent.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2021.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2020.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2019.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2018.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2017.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2016.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2015.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2014.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2013.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2012.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2011.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2010.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2009.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2008.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2007.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2006.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2005.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2004.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2003.json.gz',
-        'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-2002.json.gz']
-
+SCHEMA: str = ("https://csrc.nist.gov/schema/nvd/feed/1.1/" +
+               "nvd_cve_feed_json_1.1.schema")
+FILE_URL: str = "https://nvd.nist.gov/feeds/json/cve/1.1/"
+FILES: List[str] = [
+    FILE_URL + "nvdcve-1.1-modified.json.gz",
+    FILE_URL + "nvdcve-1.1-recent.json.gz",
+    FILE_URL + "nvdcve-1.1-2021.json.gz", FILE_URL + "nvdcve-1.1-2020.json.gz",
+    FILE_URL + "nvdcve-1.1-2019.json.gz", FILE_URL + "nvdcve-1.1-2018.json.gz",
+    FILE_URL + "nvdcve-1.1-2017.json.gz", FILE_URL + "nvdcve-1.1-2016.json.gz",
+    FILE_URL + "nvdcve-1.1-2015.json.gz", FILE_URL + "nvdcve-1.1-2014.json.gz",
+    FILE_URL + "nvdcve-1.1-2013.json.gz", FILE_URL + "nvdcve-1.1-2012.json.gz",
+    FILE_URL + "nvdcve-1.1-2011.json.gz", FILE_URL + "nvdcve-1.1-2010.json.gz",
+    FILE_URL + "nvdcve-1.1-2009.json.gz", FILE_URL + "nvdcve-1.1-2008.json.gz",
+    FILE_URL + "nvdcve-1.1-2007.json.gz", FILE_URL + "nvdcve-1.1-2006.json.gz",
+    FILE_URL + "nvdcve-1.1-2005.json.gz", FILE_URL + "nvdcve-1.1-2004.json.gz",
+    FILE_URL + "nvdcve-1.1-2003.json.gz", FILE_URL + "nvdcve-1.1-2002.json.gz"
+]
 
 # Path to dump files
-path = str(pathlib.Path(__file__).parent.absolute()) + '/dumps'
-path2 = str(pathlib.Path(__file__).parent.absolute()) + '/../'
-
-def get_meta():
-
-    # get time when modified file was last updated
-    metaURL = urlopen('https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-modified.meta')
-    newMetaTime = metaURL.readlines()[0][17:-2].decode()
-    with open(path + '/modified.meta', 'w') as outfile:
-        outfile.write(newMetaTime)
+DUMPS_PATH = str(pathlib.Path(__file__).parent.absolute()) + "/dumps"
+ROOT_PATH = str(pathlib.Path(__file__).parent.absolute()) + "/../"
 
 
-def get_dumps():
+def get_meta() -> None:
+    """Get time when modified file was last updated."""
+    with urlopen(
+            "https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-modified.meta"
+    ) as meta_url:
+        new_meta_time = meta_url.readlines()[0][17:-2].decode()
+    with open(DUMPS_PATH + "/modified.meta", "w", encoding="utf-8") as outfile:
+        outfile.write(new_meta_time)
 
-    #look for dump files and retrieve if not found
-    schemaPath = pathlib.Path(__file__).parent.absolute() / ('dumps' + schema[41:])
-    if not schemaPath.is_file():
-        urlretrieve(schema, path + schema[41:])
+
+def get_dumps() -> None:
+    """Look for dump files and retrieve if not found."""
+    schema_path = pathlib.Path(__file__).parent.absolute() / ("dumps" +
+                                                              SCHEMA[41:])
+    if not schema_path.is_file():
+        urlretrieve(SCHEMA, DUMPS_PATH + SCHEMA[41:])
         get_meta()
-    for url in files[2:]:
-        urlPath = pathlib.Path(__file__).parent.absolute() / ('dumps' + url[39:])
-        if not urlPath.is_file():
-            urlretrieve(url, path + url[39:])
+    for url in FILES[2:]:
+        url_path = pathlib.Path(__file__).parent.absolute() / ("dumps" +
+                                                               url[39:])
+        if not url_path.is_file():
+            urlretrieve(url, DUMPS_PATH + url[39:])
 
 
-def update():
+# pylint: disable=too-many-locals
+def update() -> None:
+    """Update all dump files with current CVE information
+    from NIST server."""
 
-    # download modified and recent dumps
-    modifiedFile = path + files[0][39:]
-    urlretrieve(files[0], modifiedFile)
+    # Download modified and recent dumps
+    modified_file = DUMPS_PATH + FILES[0][39:]
+    urlretrieve(FILES[0], modified_file)
 
-    recentFile = path + files[1][39:]
-    urlretrieve(files[1], recentFile)
-    
-    # get time when modified file was last updated
-    with open(path + '/modified.meta', 'r') as infile:
-        metaTime = infile.read()
-    modifiedTime = date_parse(metaTime)
+    recent_file = DUMPS_PATH + FILES[1][39:]
+    urlretrieve(FILES[1], recent_file)
 
-    # make new list of cves to add
-    modified = Database().modified(path=path2)
-    newModified = [cve for cve in modified if date_parse(cve['lastModifiedDate']) > modifiedTime]
+    # Get time when modified file was last updated
+    with open(DUMPS_PATH + "/modified.meta", "r", encoding="utf-8") as infile:
+        meta_time = infile.read()
+    modified_time = date_parse(meta_time)
 
-    # get new modified update time
+    # Make new list of cves to add
+    modified = Database().modified(path=ROOT_PATH)
+    new_modified = [
+        cve for cve in modified
+        if date_parse(cve["lastModifiedDate"]) > modified_time
+    ]
+
+    # Get new modified update time
     get_meta()
-    
-    #organize cves by year
-    for year in range(2002, 2022):   # Keep up-to-date with current year
-        modifiedCves = []
-        for cve in newModified:
-            cveYear = cve['cve']['CVE_data_meta']['ID'][4:8]
-            if int(cveYear) < 2003:
-                cveYear = '2002'
-            if cveYear == str(year):
-                modifiedCves.append(cve)
 
-        # add cves to files
-        if len(modifiedCves) > 0:
-            for cveID in modifiedCves:
-                cveYear = cveID['cve']['CVE_data_meta']['ID'][4:8]
-                ID = cveID['cve']['CVE_data_meta']['ID']
-                data = Database().data(cveYear, path=path2)
-                [data.remove(cve) for cve in data if ID == cve['cve']['CVE_data_meta']['ID']]
-            [data.append(cve) for cve in modifiedCves]
-            cveNum = len(data)
-            contents = {"CVE_data_type" : "CVE",
-                        "CVE_data_format" : "MITRE",
-                        "CVE_data_version" : "4.0",
-                        "CVE_data_numberOfCVEs" : cveNum,
-                        "CVE_data_timestamp" : metaTime,
-                        "CVE_Items" : data
-                        }
+    # Organize cves by year
+    for year in range(2002, 2022):  # Keep up-to-date with current year
+        modified_cves = []
+        for cve in new_modified:
+            cve_year = cve["cve"]["CVE_data_meta"]["ID"][4:8]
+            if int(cve_year) < 2003:
+                cve_year = "2002"
+            if cve_year == str(year):
+                modified_cves.append(cve)
 
-            # write cves to data files
-            bytesData = json.dumps(contents).encode('utf-8')
-            fileName = '/nvdcve-1.1-' + cveYear + '.json.gz'
-            filePath = pathlib.Path(__file__).parent.absolute() / ('dumps' + fileName)
-            filePath.unlink()
-            file = path + fileName
-            with gzip.open(file, 'wb') as datafile:
-                datafile.write(bytesData)
+        # Add cves to files
+        if len(modified_cves) > 0:
+            for cve_id in modified_cves:
+                cve_year = cve_id["cve"]["CVE_data_meta"]["ID"][4:8]
+                i_d = cve_id["cve"]["CVE_data_meta"]["ID"]
+                data = Database().data(cve_year, path=ROOT_PATH)
+                _ = [
+                    data.remove(cve) for cve in data
+                    if i_d == cve["cve"]["CVE_data_meta"]["ID"]
+                ]
+            _ = [data.append(cve) for cve in modified_cves]
+            cve_num = len(data)
+            contents = {
+                "CVE_data_type": "CVE",
+                "CVE_data_format": "MITRE",
+                "CVE_data_version": "4.0",
+                "CVE_data_numberOfCVEs": cve_num,
+                "CVE_data_timestamp": meta_time,
+                "CVE_Items": data
+            }
+
+            # Write cves to data files
+            bytes_data = json.dumps(contents).encode("utf-8")
+            file_name = "/nvdcve-1.1-" + cve_year + ".json.gz"
+            file_path = pathlib.Path(__file__).parent.absolute() / ("dumps" +
+                                                                    file_name)
+            file_path.unlink()
+            file = DUMPS_PATH + file_name
+            with gzip.open(file, "wb") as datafile:
+                datafile.write(bytes_data)
 
 
 if __name__ == "__main__":
@@ -130,4 +138,4 @@ if __name__ == "__main__":
         update()
     except URLError as e:
         print(e)
-        quit()
+        sys_exit()
