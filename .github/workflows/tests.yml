@@ -18,7 +18,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install flake8 coverage>=6.3 mypy webargs==8.1.0 types-python-dateutil==2.8.8
-        cd api && python update.py
+        python update.py
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
