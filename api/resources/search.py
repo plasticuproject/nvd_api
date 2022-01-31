@@ -1,105 +1,110 @@
 """
 An unofficial, RESTful API for NIST's NVD.
-Copyright (C) 2020  plasticuproject@pm.me
+Copyright (C) 2022  plasticuproject@pm.me
 """
 
+from typing import Dict, Any, List, Callable
 from flask_restful import Resource, abort
-from .model import Database
 from webargs import fields
 from webargs.flaskparser import use_args
-
+from .model import Database
 
 # Sets variable name for keyword search parameter
-keyword = {'keyword' : fields.Str(missing='')}
+keyword: Dict[str, Any] = {"keyword": fields.Str(missing="")}  # type: ignore
+location: str = "query"
 
 
-def return_result(set, *args):
-
-    # Helper function to return CVE JSON data
-    result = []
+def return_result(data: Callable[..., List[Dict[str, Any]]],
+                  *args: str) -> List[Dict[str, Any]]:
+    """Helper function to return CVE JSON data."""
+    result: List[Dict[str, Any]] = []
     if len(args) == 0:
-        for cve in set():
+        for cve in data():
             result.append(cve)
     elif len(args) == 1:
-        for cve in set(args[0]):
+        for cve in data(args[0]):
             result.append(cve)
     return result
 
 
-def keyword_search(value, result):
-
-    # Helper function to parse results for keyword argument in CVE description
-    keyword_results = []
+def keyword_search(value: str,
+                   result: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Helper function to parse results for keyword
+    argument in CVE description."""
+    keyword_results: List[Dict[str, Any]] = []
     for cve in result:
-        for description in cve['cve']['description']['description_data']:
-            if value in description['value'].lower():
+        for description in cve["cve"]["description"]["description_data"]:
+            if value in description["value"].lower():
                 keyword_results.append(cve)
     return keyword_results
 
-def cpe_search(value, result, version: str='23'):
-    
-    # Helper function to search for results with a matching CPE value
-    results = []
 
-    def find_leaves(nodes):
+def cpe_search(value: str,
+               result: List[Dict[str, Any]],
+               version: str = "23") -> List[Dict[str, Any]]:
+    """Helper function to search for results with
+    a matching CPE value."""
+    results: List[Dict[str, Any]] = []
 
-        # Recursive function to obtain all configuration leaves of a CVE's
-        # configuration nodes.
-        leaves = []
+    def find_leaves(nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Recursive function to obtain all configuration leaves of a CVE"s
+        configuration nodes."""
+        leaves: List[Dict[str, Any]] = []
         for subnode in nodes:
-            if 'children' in subnode.keys() and len(subnode['children']) > 0:
-                leaves += find_leaves(subnode['children'])
-            elif 'cpe_match' in subnode.keys():
-                leaves += find_leaves(subnode['cpe_match'])
+            if "children" in subnode.keys() and len(subnode["children"]) > 0:
+                leaves += find_leaves(subnode["children"])
+            elif "cpe_match" in subnode.keys():
+                leaves += find_leaves(subnode["cpe_match"])
             else:
                 leaves.append(subnode)
         return leaves
 
     for cve in result:
-        if 'configurations' in cve and 'nodes' in cve['configurations']:
-            leaves = find_leaves(cve['configurations']['nodes'])
+        if "configurations" in cve and "nodes" in cve["configurations"]:
+            leaves = find_leaves(cve["configurations"]["nodes"])
             for leaf in leaves:
-                key = 'cpe' + version + 'Uri'
+                key = "cpe" + version + "Uri"
                 if key in leaf.keys() and value in leaf[key]:
                     results.append(cve)
     return results
 
 
-
-def check_year(year):
-
-    # Helper function to make sure the input year is valid
+def check_year(year: str) -> None:
+    """Helper function to make sure the input year is valid."""
     try:
         int(year)
     except ValueError:
-        abort(404, message='No such endpoint exists')
+        abort(404, message="No such endpoint exists")
 
 
-class CVE(Resource):
+class Cve(Resource):
     """Initiates the Database class, loads the correct CVE year archive
     file in memory and returns the CVE data in the file matching the given
     CVE-ID in a JSON response via a GET request.
     """
 
     # For the rate limiter decorator
-    decorators = []
+    decorators: List[Any] = []
 
-    def get(self,cve_id):
+    @staticmethod
+    def get(cve_id: str) -> Dict[str, Any]:
+        """FUCK"""
         cve_id = cve_id.upper()
         data = Database().data
         year = cve_id[4:8]
         check_year(year)
         if int(year) > 2002:
             for cve in data(year):
-                if cve['cve']['CVE_data_meta']['ID'] == cve_id:
-                    return cve
+                if cve["cve"]["CVE_data_meta"]["ID"] == cve_id:
+                    cve_data = cve
         elif int(year) <= 2002:
-            for cve in data('2002'):
-                if cve['cve']['CVE_data_meta']['ID'] == cve_id:
-                    return cve
+            for cve in data("2002"):
+                if cve["cve"]["CVE_data_meta"]["ID"] == cve_id:
+                    cve_data = cve
+        return cve_data
 
 
-class CVE_Year(Resource):
+class CveYear(Resource):
     """Initiates the Database class, loads the correct CVE year archive
     file in memory and returns all CVE data in the file matching the given
     year and keyword argument in a JSON response via a GET request.
@@ -107,63 +112,69 @@ class CVE_Year(Resource):
     """
 
     # For the rate limiter decorator
-    decorators = []
+    decorators: List[Any] = []
 
-    @use_args(keyword)
-    def get(self, args, year):
+    @staticmethod
+    @use_args(keyword, location=location)
+    def get(args: Dict[str, str], year: str) -> List[Dict[str, str]]:
+        """FUCK"""
         data = Database().data
         check_year(year)
         if int(year) > 2002:
             result = return_result(data, year)
         elif int(year) < 2003:
             result = []
-            for cve in data('2002'):
-                if cve['cve']['CVE_data_meta']['ID'][4:8] == str(year):
+            for cve in data("2002"):
+                if cve["cve"]["CVE_data_meta"]["ID"][4:8] == str(year):
                     result.append(cve)
-        if args['keyword'] == '':
+        if args["keyword"] == "":
             return result
-        return keyword_search(args['keyword'].lower(), result)
+        return keyword_search(args["keyword"].lower(), result)
 
 
-class CVE_Modified(Resource):
-    """Initiates the Database class, loads the 'modified' archive file in
+class CveModified(Resource):
+    """Initiates the Database class, loads the "modified" archive file in
     memory and returns all CVE data in the file matching the given
     keyword argument in a JSON response via a GET request. If no keyword
     is given it will return all CVEs in the file.
     """
 
     # For the rate limiter decorator
-    decorators = []
+    decorators: List[Any] = []
 
-    @use_args(keyword)
-    def get(self, args):
+    @staticmethod
+    @use_args(keyword, location=location)
+    def get(args: Dict[str, str]) -> List[Dict[str, str]]:
+        """FUCK"""
         modified = Database().modified
         result = return_result(modified)
-        if args['keyword'] == '':
+        if args["keyword"] == "":
             return result
-        return keyword_search(args['keyword'].lower(), result)
-        
+        return keyword_search(args["keyword"].lower(), result)
 
-class CVE_Recent(Resource):
-    """Initiates the Database class, loads the 'recent' archive file in
+
+class CveRecent(Resource):
+    """Initiates the Database class, loads the "recent" archive file in
     memory and returns all CVE data in the file matching the given
     keyword argument in a JSON response via a GET request. If no keyword
     is given it will return all CVEs in the file.
     """
 
     # For the rate limiter decorator
-    decorators = []
+    decorators: List[Any] = []
 
-    @use_args(keyword)
-    def get(self, args):
+    @staticmethod
+    @use_args(keyword, location=location)
+    def get(args: Dict[str, str]) -> List[Dict[str, str]]:
+        """FUCK"""
         recent = Database().recent
         result = return_result(recent)
-        if args['keyword'] == '':
+        if args["keyword"] == "":
             return result
-        return keyword_search(args['keyword'].lower(), result)
+        return keyword_search(args["keyword"].lower(), result)
 
 
-class CVE_All(Resource):
+class CveAll(Resource):
     """Initiates the Database class, loads all CVE year archive files in
     memory and returns all the CVE data in those files matching the given
     keyword argument in a JSON response via a GET request. If no keyword
@@ -171,21 +182,23 @@ class CVE_All(Resource):
     """
 
     # For the rate limiter decorator
-    decorators = []
+    decorators: List[Any] = []
 
-    @use_args(keyword)
-    def get(self, args):
+    @staticmethod
+    @use_args(keyword, location=location)
+    def get(args: Dict[str, str]) -> List[Dict[str, str]]:
+        """FUCK"""
         result = []
         data = Database().data
-        for year in range(2002, 2022):  # Keep up-to-date with current year
+        for year in range(2002, 2023):  # Keep up-to-date with current year
             for cve in data(str(year)):
                 result.append(cve)
-        if args['keyword'] == '':
+        if args["keyword"] == "":
             return result
-        return keyword_search(args['keyword'].lower(), result)
+        return keyword_search(args["keyword"].lower(), result)
 
 
-class CVE_CPE(Resource):
+class CveCpe(Resource):
     """Initiates the Database class, loads all CVE archive
     file in memory and returns all CVE data in the file matching the given
     CPE-ID and keyword argument in a JSON response via a GET request.
@@ -194,17 +207,20 @@ class CVE_CPE(Resource):
     """
 
     # For the rate limiter decorator
-    decorators = []
+    decorators: List[Any] = []
 
-    @use_args(keyword)
-    def get(self, args, cpe_version, cpe_id):
-        result = []
+    @staticmethod
+    @use_args(keyword, location=location)
+    def get(args: Dict[str, str], cpe_version: str,
+            cpe_id: str) -> List[Dict[str, Any]]:
+        """FUCK"""
+        result: List[Dict[str, Any]] = []
         data = Database().data
-        for year in range(2002, 2022):  # Keep up-to-date with current year
+        for year in range(2002, 2023):  # Keep up-to-date with current year
             for cve in data(str(year)):
                 result.append(cve)
-        if args['keyword'] != '':
-            result = keyword_search(args['keyword'].lower(), result)
+        if args["keyword"] != "":
+            result = keyword_search(args["keyword"].lower(), result)
         return cpe_search(cpe_id, result, version=str(cpe_version))
 
 
@@ -214,9 +230,10 @@ class Schema(Resource):
     """
 
     # For the rate limiter decorator
-    decorators = []
+    decorators: List[Any] = []
 
-    def get(self):
+    @staticmethod
+    def get() -> Dict[str, Any]:
+        """FUCK"""
         schema = Database().schema
         return schema()
-

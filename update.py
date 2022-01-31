@@ -12,15 +12,15 @@ from urllib.error import URLError
 from urllib.request import urlopen
 from urllib.request import urlretrieve
 from dateutil.parser import isoparse as date_parse
-from resources.model import Database
+from api.resources.model import Database
 
 # NIST NVD JSON Dump file locations
 SCHEMA: str = ("https://csrc.nist.gov/schema/nvd/feed/1.1/" +
                "nvd_cve_feed_json_1.1.schema")
 FILE_URL: str = "https://nvd.nist.gov/feeds/json/cve/1.1/"
 FILES: List[str] = [
-    FILE_URL + "nvdcve-1.1-modified.json.gz",
-    FILE_URL + "nvdcve-1.1-recent.json.gz",
+    FILE_URL + "nvdcve-1.1-modified.json.gz", FILE_URL +
+    "nvdcve-1.1-recent.json.gz", FILE_URL + "nvdcve-1.1-2022.json.gz",
     FILE_URL + "nvdcve-1.1-2021.json.gz", FILE_URL + "nvdcve-1.1-2020.json.gz",
     FILE_URL + "nvdcve-1.1-2019.json.gz", FILE_URL + "nvdcve-1.1-2018.json.gz",
     FILE_URL + "nvdcve-1.1-2017.json.gz", FILE_URL + "nvdcve-1.1-2016.json.gz",
@@ -34,8 +34,8 @@ FILES: List[str] = [
 ]
 
 # Path to dump files
-DUMPS_PATH = str(pathlib.Path(__file__).parent.absolute()) + "/dumps"
-ROOT_PATH = str(pathlib.Path(__file__).parent.absolute()) + "/../"
+DUMPS_PATH = str(pathlib.Path(__file__).parent.absolute()) + "/api/dumps"
+ROOT_PATH = str(pathlib.Path(__file__).parent.absolute()) + "/"
 
 
 def get_meta() -> None:
@@ -90,7 +90,7 @@ def update() -> None:
     get_meta()
 
     # Organize cves by year
-    for year in range(2002, 2022):  # Keep up-to-date with current year
+    for year in range(2002, 2023):  # Keep up-to-date with current year
         modified_cves = []
         for cve in new_modified:
             cve_year = cve["cve"]["CVE_data_meta"]["ID"][4:8]
@@ -106,10 +106,10 @@ def update() -> None:
                 i_d = cve_id["cve"]["CVE_data_meta"]["ID"]
                 data = Database().data(cve_year, path=ROOT_PATH)
                 _ = [
-                    data.remove(cve) for cve in data
+                    data.remove(cve) for cve in data  # type: ignore
                     if i_d == cve["cve"]["CVE_data_meta"]["ID"]
                 ]
-            _ = [data.append(cve) for cve in modified_cves]
+            _ = [data.append(cve) for cve in modified_cves]  # type: ignore
             cve_num = len(data)
             contents = {
                 "CVE_data_type": "CVE",
