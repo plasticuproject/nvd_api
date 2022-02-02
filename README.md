@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.com/plasticuproject/nvd_api.svg?branch=master)](https://travis-ci.com/plasticuproject/nvd_api)
-[![Python 3.7](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/release/python-370/)
+[![build](https://github.com/plasticuproject/nvd_api/actions/workflows/tests.yml/badge.svg)](https://github.com/plasticuproject/nvd_api/actions/workflows/tests.yml)
+[![Python 3.8](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 [![Coverage Status](https://coveralls.io/repos/github/plasticuproject/nvd_api/badge.svg?branch=master)](https://coveralls.io/github/plasticuproject/nvd_api?branch=master)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/plasticuproject/nvd_api.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/plasticuproject/nvd_api/context:python)
