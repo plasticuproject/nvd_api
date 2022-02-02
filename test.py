@@ -6,8 +6,8 @@ import unittest
 from api.app import app
 
 
-class BasicTests(unittest.TestCase):
-    """Test endpoints and search functions"""
+class ApiTests(unittest.TestCase):
+    """Test endpoints and search functions."""
 
     def setUp(self) -> None:
         app.config["DEBUG"] = False

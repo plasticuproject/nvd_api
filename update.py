@@ -7,6 +7,7 @@ import gzip
 import json
 import pathlib
 from sys import exit as sys_exit
+from datetime import datetime
 from typing import List
 from urllib.error import URLError
 from urllib.request import urlopen
@@ -36,6 +37,9 @@ FILES: List[str] = [
 # Path to dump files
 DUMPS_PATH = str(pathlib.Path(__file__).parent.absolute()) + "/api/dumps"
 ROOT_PATH = str(pathlib.Path(__file__).parent.absolute()) + "/"
+
+# Current year
+YEAR = datetime.now().year
 
 
 def get_meta() -> None:
@@ -90,7 +94,7 @@ def update() -> None:
     get_meta()
 
     # Organize cves by year
-    for year in range(2002, 2023):  # Keep up-to-date with current year
+    for year in range(2002, (YEAR + 1)):
         modified_cves = []
         for cve in new_modified:
             cve_year = cve["cve"]["CVE_data_meta"]["ID"][4:8]
@@ -132,7 +136,6 @@ def update() -> None:
 
 
 if __name__ == "__main__":
-
     try:
         get_dumps()
         update()

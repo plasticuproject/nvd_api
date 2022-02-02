@@ -13,7 +13,7 @@ def _return_data(file: str) -> List[Dict[str, Any]]:
     data: List[Dict[str, Any]]
     with gzip.open(file, "rb") as datafile:
         data = json.loads(datafile.read())["CVE_Items"]
-        return data
+    return data
 
 
 class Database:

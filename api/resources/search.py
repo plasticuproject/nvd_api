@@ -3,11 +3,15 @@ An unofficial, RESTful API for NIST's NVD.
 Copyright (C) 2022  plasticuproject@pm.me
 """
 
+from datetime import datetime
 from typing import Dict, Any, List, Callable
 from flask_restful import Resource, abort
 from webargs import fields
 from webargs.flaskparser import use_args
 from .model import Database
+
+# Current year
+YEAR = datetime.now().year
 
 # Sets variable name for keyword search parameter
 keyword: Dict[str, Any] = {"keyword": fields.Str(missing="")}  # type: ignore
@@ -88,7 +92,7 @@ class Cve(Resource):
 
     @staticmethod
     def get(cve_id: str) -> Dict[str, Any]:
-        """FUCK"""
+        """GET method for Cve endpoint."""
         cve_id = cve_id.upper()
         data = Database().data
         year = cve_id[4:8]
@@ -117,7 +121,7 @@ class CveYear(Resource):
     @staticmethod
     @use_args(keyword, location=location)
     def get(args: Dict[str, str], year: str) -> List[Dict[str, str]]:
-        """FUCK"""
+        """GET method for CveYear endpoint."""
         data = Database().data
         check_year(year)
         if int(year) > 2002:
@@ -145,7 +149,7 @@ class CveModified(Resource):
     @staticmethod
     @use_args(keyword, location=location)
     def get(args: Dict[str, str]) -> List[Dict[str, str]]:
-        """FUCK"""
+        """GET method for CveModified endpoint."""
         modified = Database().modified
         result = return_result(modified)
         if args["keyword"] == "":
@@ -166,7 +170,7 @@ class CveRecent(Resource):
     @staticmethod
     @use_args(keyword, location=location)
     def get(args: Dict[str, str]) -> List[Dict[str, str]]:
-        """FUCK"""
+        """GET method for CveRecent endpoint."""
         recent = Database().recent
         result = return_result(recent)
         if args["keyword"] == "":
@@ -187,10 +191,10 @@ class CveAll(Resource):
     @staticmethod
     @use_args(keyword, location=location)
     def get(args: Dict[str, str]) -> List[Dict[str, str]]:
-        """FUCK"""
+        """GET method for CveAll endpoint."""
         result = []
         data = Database().data
-        for year in range(2002, 2023):  # Keep up-to-date with current year
+        for year in range(2002, (YEAR + 1)):
             for cve in data(str(year)):
                 result.append(cve)
         if args["keyword"] == "":
@@ -213,10 +217,10 @@ class CveCpe(Resource):
     @use_args(keyword, location=location)
     def get(args: Dict[str, str], cpe_version: str,
             cpe_id: str) -> List[Dict[str, Any]]:
-        """FUCK"""
+        """GET method for CveCpe endpoint."""
         result: List[Dict[str, Any]] = []
         data = Database().data
-        for year in range(2002, 2023):  # Keep up-to-date with current year
+        for year in range(2002, (YEAR + 1)):
             for cve in data(str(year)):
                 result.append(cve)
         if args["keyword"] != "":
@@ -234,6 +238,6 @@ class Schema(Resource):
 
     @staticmethod
     def get() -> Dict[str, Any]:
-        """FUCK"""
+        """GET method for Schema endpoint."""
         schema = Database().schema
         return schema()

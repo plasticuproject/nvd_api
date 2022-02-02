@@ -1,3 +1,6 @@
+# Swap files
+*.swp
+
 # NVD dump files
 /api/dumps/nvd*
 
