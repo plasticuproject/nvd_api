@@ -59,7 +59,7 @@ class ApiTests(unittest.TestCase):
     def test_all(self) -> None:
         """Test all endpoint."""
         response = self.app.get("/nvd-api/v1/all", follow_redirects=True)
-        response2 = self.app.get("/nvd-api/v1/all?keyword=the",
+        response2 = self.app.get("/nvd-api/v1/all?keyword=sudo",
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response2.status_code, 200)
