@@ -32,10 +32,13 @@ class ApiTests(unittest.TestCase):
                                  follow_redirects=True)
         response4 = self.app.get("/nvd-api/v1/year/2020?keyword=the",
                                  follow_redirects=True)
+        response5 = self.app.get("/nvd-api/v1/year/2002?keyword=the",
+                                 follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response2.status_code, 404)
         self.assertEqual(response3.status_code, 200)
         self.assertEqual(response4.status_code, 200)
+        self.assertEqual(response5.status_code, 200)
 
     def test_recent(self) -> None:
         """Test recent endpoint."""

@@ -14,7 +14,9 @@ from .model import Database
 YEAR = datetime.now().year
 
 # Sets variable name for keyword search parameter
-keyword: Dict[str, Any] = {"keyword": fields.Str(missing="")}  # type: ignore
+keyword: Dict[str, Any] = {
+    "keyword": fields.List(fields.Str(missing=""))  # type: ignore
+}
 location: str = "query"
 
 
@@ -26,19 +28,20 @@ def return_result(data: Callable[..., List[Dict[str, Any]]],
         for cve in data():
             result.append(cve)
     elif len(args) == 1:
-        for cve in data(args[0]):
+        for cve in data(args[0]):  # lgtm[py/call/wrong-arguments]
             result.append(cve)
     return result
 
 
-def keyword_search(value: str,
+def keyword_search(value: List[str],
                    result: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Helper function to parse results for keyword
     argument in CVE description."""
     keyword_results: List[Dict[str, Any]] = []
+    keyword_list: List[str] = [_.lower() for _ in value]
     for cve in result:
         for description in cve["cve"]["description"]["description_data"]:
-            if value in description["value"].lower():
+            if all(_ in description["value"].lower() for _ in keyword_list):
                 keyword_results.append(cve)
     return keyword_results
 
@@ -95,7 +98,8 @@ class Cve(Resource):
         """GET method for Cve endpoint."""
         cve_id = cve_id.upper()
         data = Database().data
-        year = cve_id[4:8]
+        year: str = cve_id[4:8]
+        cve_data: Dict[str, Any]
         check_year(year)
         if int(year) > 2002:
             for cve in data(year):
@@ -120,20 +124,26 @@ class CveYear(Resource):
 
     @staticmethod
     @use_args(keyword, location=location)
-    def get(args: Dict[str, str], year: str) -> List[Dict[str, Any]]:
+    def get(args: Dict[str, List[str]], year: str) -> List[Dict[str, Any]]:
         """GET method for CveYear endpoint."""
+        year_result: List[Dict[str, Any]]
+        result: List[Dict[str, Any]] = []
         data = Database().data
         check_year(year)
         if int(year) > 2002:
-            result = return_result(data, year)
+            year_result = return_result(data, year)
         elif int(year) < 2003:
-            result = []
+            year_result = []
             for cve in data("2002"):
                 if cve["cve"]["CVE_data_meta"]["ID"][4:8] == str(year):
-                    result.append(cve)
-        if args["keyword"] == "":
-            return result
-        return keyword_search(args["keyword"].lower(), result)
+                    year_result.append(cve)
+        if args:
+            keyed = keyword_search(args["keyword"], year_result)
+            if keyed:
+                result.append(keyed[0])
+        else:
+            return year_result
+        return result
 
 
 class CveModified(Resource):
@@ -148,13 +158,13 @@ class CveModified(Resource):
 
     @staticmethod
     @use_args(keyword, location=location)
-    def get(args: Dict[str, str]) -> List[Dict[str, Any]]:
+    def get(args: Dict[str, List[str]]) -> List[Dict[str, Any]]:
         """GET method for CveModified endpoint."""
         modified = Database().modified
-        result = return_result(modified)
-        if args["keyword"] == "":
-            return result
-        return keyword_search(args["keyword"].lower(), result)
+        result: List[Dict[str, Any]] = return_result(modified)
+        if args:
+            return keyword_search(args["keyword"], result)
+        return result
 
 
 class CveRecent(Resource):
@@ -169,13 +179,13 @@ class CveRecent(Resource):
 
     @staticmethod
     @use_args(keyword, location=location)
-    def get(args: Dict[str, str]) -> List[Dict[str, Any]]:
+    def get(args: Dict[str, List[str]]) -> List[Dict[str, Any]]:
         """GET method for CveRecent endpoint."""
         recent = Database().recent
-        result = return_result(recent)
-        if args["keyword"] == "":
-            return result
-        return keyword_search(args["keyword"].lower(), result)
+        result: List[Dict[str, Any]] = return_result(recent)
+        if args:
+            return keyword_search(args["keyword"], result)
+        return result
 
 
 class CveAll(Resource):
@@ -190,14 +200,14 @@ class CveAll(Resource):
 
     @staticmethod
     @use_args(keyword, location=location)
-    def get(args: Dict[str, str]) -> List[Dict[str, Any]]:
+    def get(args: Dict[str, List[str]]) -> List[Dict[str, Any]]:
         """GET method for CveAll endpoint."""
         result: List[Dict[str, Any]] = []
         data = Database().data
         for year in range(2002, (YEAR + 1)):
             for cve in data(str(year)):
-                if args["keyword"] != "":
-                    keyed = keyword_search(args["keyword"].lower(), [cve])
+                if args:
+                    keyed = keyword_search(args["keyword"], [cve])
                     if keyed:
                         result.append(keyed[0])
                 else:
@@ -218,16 +228,19 @@ class CveCpe(Resource):
 
     @staticmethod
     @use_args(keyword, location=location)
-    def get(args: Dict[str, str], cpe_version: str,
+    def get(args: Dict[str, List[str]], cpe_version: str,
             cpe_id: str) -> List[Dict[str, Any]]:
         """GET method for CveCpe endpoint."""
         result: List[Dict[str, Any]] = []
         data = Database().data
         for year in range(2002, (YEAR + 1)):
             for cve in data(str(year)):
-                result.append(cve)
-        if args["keyword"] != "":
-            result = keyword_search(args["keyword"].lower(), result)
+                if args:
+                    keyed = keyword_search(args["keyword"], [cve])
+                    if keyed:
+                        result.append(keyed[0])
+                else:
+                    result.append(cve)
         return cpe_search(cpe_id, result, version=str(cpe_version))
 
 
