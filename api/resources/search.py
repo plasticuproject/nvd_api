@@ -28,7 +28,7 @@ def return_result(data: Callable[..., List[Dict[str, Any]]],
         for cve in data():
             result.append(cve)
     elif len(args) == 1:
-        for cve in data(args[0]):
+        for cve in data(args[0]):  # lgtm[py/call/wrong-arguments]
             result.append(cve)
     return result
 
