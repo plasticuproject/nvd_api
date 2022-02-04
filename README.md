@@ -35,13 +35,15 @@ An unofficial, RESTful API for NIST's NVD.
 ## Keyword Search 
 **For endpoints:** <br />
 *../all* <br />
-*../year/(YEAR)* <br />
+*../year/\<YEAR\>* <br />
 *../recent* <br />
 *../modified* <br />
-*../cpe/(CPE-Version)/(CPE-ID matcher)* <br />
-you can also add a keyword search parameter to return only CVEs with <br />
+*../cpe/\<CPE-Version\>/\<CPE-ID matcher\>* <br />
+you can add a keyword search parameter to return only CVEs with <br />
 that keyword found in the description, for example:  <br />
 *https://plasticuproject.pythonanywhere.com/nvd-api/v1/year/2019?keyword=sudo* <br />
+Or search for multiple keywords and return CVEs containing all keywords: <br />
+*https://plasticuproject.pythonanywhere.com/nvd-api/v1/year/2020?keyword=sudo&keyword=linux* <br />
 
 ## Note:
 All endpoint GET requests will return JSON response data.  <br />
