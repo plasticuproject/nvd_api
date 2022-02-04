@@ -9,7 +9,7 @@
 
 An unofficial, RESTful API for NIST's NVD.
 
-## Endpoints with examples:
+## Endpoints with DEMO examples:
 
 **Get results for a specific CVE-ID:** <br />
 *https://plasticuproject.pythonanywhere.com/nvd-api/v1/CVE-2010-4662* <br />
