@@ -4,7 +4,7 @@ Copyright (C) 2022  plasticuproject@pm.me
 """
 
 from datetime import datetime
-from typing import Dict, Any, List, Callable
+from typing import Dict, Any, List, Callable, Optional
 from flask_restful import Resource, abort
 from webargs import fields
 from webargs.flaskparser import use_args
@@ -94,12 +94,12 @@ class Cve(Resource):
     decorators: List[Any] = []
 
     @staticmethod
-    def get(cve_id: str) -> Dict[str, Any]:
+    def get(cve_id: str) -> Optional[Dict[str, Any]]:
         """GET method for Cve endpoint."""
         cve_id = cve_id.upper()
         data = Database().data
         year: str = cve_id[4:8]
-        cve_data: Dict[str, Any]
+        cve_data: Optional[Dict[str, Any]] = None
         check_year(year)
         if int(year) > 2002:
             for cve in data(year):
@@ -109,6 +109,8 @@ class Cve(Resource):
             for cve in data("2002"):
                 if cve["cve"]["CVE_data_meta"]["ID"] == cve_id:
                     cve_data = cve
+        if not cve_data:
+            abort(404, message="No matching CVE-ID found.")
         return cve_data
 
 
