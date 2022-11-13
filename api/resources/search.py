@@ -15,7 +15,7 @@ YEAR = datetime.now().year
 
 # Sets variable name for keyword search parameter
 keyword: Dict[str, Any] = {
-    "keyword": fields.List(fields.Str(missing=""))  # type: ignore
+    "keyword": fields.List(fields.Str(missing=""))
 }
 location: str = "query"
 
