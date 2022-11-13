@@ -17,11 +17,9 @@ limiter = Limiter(app,
                   key_func=get_remote_address,
                   default_limits=["50/hour", "200/day"])
 
-rate = limiter.limit("1/second, 5/minute",
-                     error_message={
-                         "Rate Limit Exceeded":
-                         "1/second, 5/minutes, 50/hour, 200/day"
-                     })
+rate = limiter.limit(
+    "1/second, 5/minute",
+    error_message="Rate Limit Exceeded: 1/second, 5/minutes, 50/hour, 200/day")
 
 
 @limiter.request_filter

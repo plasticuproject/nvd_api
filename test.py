@@ -74,7 +74,7 @@ class ApiTests(unittest.TestCase):
         response2 = self.app.get("/nvd-api/v1/CVE-2000-1246",
                                  follow_redirects=True)
         response3 = self.app.get("/nvd-api/v1/bullshit", follow_redirects=True)
-        response4 = self.app.get("/nvd-api/v1/CVE-2021-3999",
+        response4 = self.app.get("/nvd-api/v1/CVE-2021-9999",
                                  follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response2.status_code, 200)
