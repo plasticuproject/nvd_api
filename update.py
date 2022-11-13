@@ -127,7 +127,7 @@ def update() -> None:
             # Write cves to data files
             bytes_data = json.dumps(contents).encode("utf-8")
             file_name = "/nvdcve-1.1-" + cve_year + ".json.gz"
-            file_path = pathlib.Path(__file__).parent.absolute() / ("dumps" +
+            file_path = pathlib.Path(__file__).parent.absolute() / ("api/dumps" +
                                                                     file_name)
             file_path.unlink()
             file = DUMPS_PATH + file_name
