@@ -2,7 +2,7 @@
 [![Python 3.8](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 [![Coverage Status](https://coveralls.io/repos/github/plasticuproject/nvd_api/badge.svg?branch=master)](https://coveralls.io/github/plasticuproject/nvd_api?branch=master)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/plasticuproject/nvd_api.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/plasticuproject/nvd_api/context:python)
+[![CodeQL](https://github.com/plasticuproject/nvd_api/actions/workflows/codeql.yml/badge.svg)](https://github.com/plasticuproject/nvd_api/actions/workflows/codeql.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=plasticuproject_nvd_api&metric=alert_status)](https://sonarcloud.io/dashboard?id=plasticuproject_nvd_api)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=plasticuproject_nvd_api&metric=security_rating)](https://sonarcloud.io/dashboard?id=plasticuproject_nvd_api)
 # nvd_api
