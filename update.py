@@ -15,31 +15,24 @@ from urllib.request import urlretrieve
 from dateutil.parser import isoparse as date_parse
 from api.resources.model import Database
 
-# NIST NVD JSON Dump file locations
-SCHEMA: str = ("https://csrc.nist.gov/schema/nvd/feed/1.1/" +
-               "nvd_cve_feed_json_1.1.schema")
-FILE_URL: str = "https://nvd.nist.gov/feeds/json/cve/1.1/"
-FILES: List[str] = [
-    FILE_URL + "nvdcve-1.1-modified.json.gz", FILE_URL +
-    "nvdcve-1.1-recent.json.gz", FILE_URL + "nvdcve-1.1-2022.json.gz",
-    FILE_URL + "nvdcve-1.1-2021.json.gz", FILE_URL + "nvdcve-1.1-2020.json.gz",
-    FILE_URL + "nvdcve-1.1-2019.json.gz", FILE_URL + "nvdcve-1.1-2018.json.gz",
-    FILE_URL + "nvdcve-1.1-2017.json.gz", FILE_URL + "nvdcve-1.1-2016.json.gz",
-    FILE_URL + "nvdcve-1.1-2015.json.gz", FILE_URL + "nvdcve-1.1-2014.json.gz",
-    FILE_URL + "nvdcve-1.1-2013.json.gz", FILE_URL + "nvdcve-1.1-2012.json.gz",
-    FILE_URL + "nvdcve-1.1-2011.json.gz", FILE_URL + "nvdcve-1.1-2010.json.gz",
-    FILE_URL + "nvdcve-1.1-2009.json.gz", FILE_URL + "nvdcve-1.1-2008.json.gz",
-    FILE_URL + "nvdcve-1.1-2007.json.gz", FILE_URL + "nvdcve-1.1-2006.json.gz",
-    FILE_URL + "nvdcve-1.1-2005.json.gz", FILE_URL + "nvdcve-1.1-2004.json.gz",
-    FILE_URL + "nvdcve-1.1-2003.json.gz", FILE_URL + "nvdcve-1.1-2002.json.gz"
-]
-
 # Path to dump files
 DUMPS_PATH = str(pathlib.Path(__file__).parent.absolute()) + "/api/dumps"
 ROOT_PATH = str(pathlib.Path(__file__).parent.absolute()) + "/"
 
 # Current year
 YEAR = datetime.now().year
+
+# NIST NVD JSON Dump file locations
+SCHEMA: str = ("https://csrc.nist.gov/schema/nvd/feed/1.1/" +
+               "nvd_cve_feed_json_1.1.schema")
+FILE_URL: str = "https://nvd.nist.gov/feeds/json/cve/1.1/"
+FILES: List[str] = [
+    FILE_URL + "nvdcve-1.1-modified.json.gz",
+    FILE_URL + "nvdcve-1.1-recent.json.gz",
+    FILE_URL + "nvdcve-1.1-2022.json.gz"
+]
+for _year in range(2002, YEAR + 1):
+    FILES.append(FILE_URL + f"nvdcve-1.1-{_year}.json.gz")
 
 
 def get_meta() -> None:
@@ -127,8 +120,8 @@ def update() -> None:
             # Write cves to data files
             bytes_data = json.dumps(contents).encode("utf-8")
             file_name = "/nvdcve-1.1-" + cve_year + ".json.gz"
-            file_path = pathlib.Path(__file__).parent.absolute() / ("api/dumps" +
-                                                                    file_name)
+            file_path = pathlib.Path(__file__).parent.absolute() / (
+                "api/dumps" + file_name)
             file_path.unlink()
             file = DUMPS_PATH + file_name
             with gzip.open(file, "wb") as datafile:
