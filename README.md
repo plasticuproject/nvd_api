@@ -7,6 +7,10 @@
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=plasticuproject_nvd_api&metric=security_rating)](https://sonarcloud.io/dashboard?id=plasticuproject_nvd_api)
 # nvd_api
 
+> **NOTE:** This project is archived due to NIST discontinuing the json feeds and
+> migrating users to their own API. I have included a set of outdated feeds for
+> this archive. The pythonanywhere demo will no longer be maintained as well.
+
 An unofficial, RESTful API for NIST's NVD.
 
 ## Endpoints with DEMO examples:
